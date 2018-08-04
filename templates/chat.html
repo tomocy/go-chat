@@ -8,5 +8,49 @@
 </head>
 <body>
     Lets's Chat from template
+    <ul id="messages"></ul>
+
+    <form id="chatbox">
+        <textarea></textarea>
+        <input type="submit" value="send">
+    </form>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $(function() {
+            var socket = null
+            var messages = $("#messages")
+            var msgBox = $("#chatbox textarea")
+
+            if (!window["WebSocket"]) {
+                alert("this browser support websocket")
+                return
+            }
+
+            socket = new WebSocket("ws://localhost:8080/room")
+            socket.onclose = function() {
+                alert("websocket connection was closed")
+            }
+            socket.onmessage = function(e) {
+                messages.append($("<li>").text(e.data))
+            }
+
+            $("#chatbox").submit(function() {
+                var val = msgBox.val()
+                if (!val) {
+                    return false
+                }
+
+                if (!socket) {
+                    alert("this browser is not connecting to websocket")
+                    return false
+                }
+
+                socket.send(val)
+                msgBox.val("")
+                return false
+            })
+        })
+    </script>
 </body>
 </html>
