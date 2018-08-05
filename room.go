@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/tomocy/trace"
 )
 
 type room struct {
@@ -12,6 +13,7 @@ type room struct {
 	join    chan *client
 	leave   chan *client
 	clients map[*client]bool
+	tracer  trace.Tracer
 }
 
 func newRoom() *room {
