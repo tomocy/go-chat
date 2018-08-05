@@ -29,15 +29,20 @@ func (r *room) run() {
 	for {
 		select {
 		case client := <-r.join:
+			r.tracer.Trace("new client joined")
 			r.clients[client] = true
 		case client := <-r.leave:
+			r.tracer.Trace("client left")
 			delete(r.clients, client)
 			close(client.send)
 		case msg := <-r.forward:
+			r.tracer.Trace("received message: ", string(msg))
 			for client := range r.clients {
 				select {
 				case client.send <- msg:
+					r.tracer.Trace("-- sent message")
 				default:
+					r.tracer.Trace("-- failed to send message. clean up the client")
 					delete(r.clients, client)
 					close(client.send)
 				}
