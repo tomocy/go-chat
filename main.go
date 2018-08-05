@@ -4,16 +4,12 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"os"
-
-	"github.com/tomocy/trace"
 )
 
 func main() {
 	addr := flag.String("addr", ":8080", "the application address")
 	flag.Parse()
 	r := newRoom()
-	r.tracer = trace.New(os.Stdout)
 	http.Handle("/", &templateHandler{fileName: "chat.html"})
 	http.Handle("/room", r)
 
