@@ -4,11 +4,20 @@ import (
 	"flag"
 	"log"
 	"net/http"
+
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/google"
 )
 
 func main() {
 	addr := flag.String("addr", ":8080", "the application address")
 	flag.Parse()
+
+	gomniauth.SetSecurityKey(gomniauthSecret)
+	gomniauth.WithProviders(
+		google.New(googleClientKey, googleClientSecret, googleCallbackURL),
+	)
+
 	r := newRoom()
 	http.Handle("/chat", MustAuth(&templateHandler{fileName: "chat.html"}))
 	http.Handle("/login", &templateHandler{fileName: "login.html"})
