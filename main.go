@@ -33,6 +33,8 @@ func main() {
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	})
 	http.HandleFunc("/auth/", loginHandler)
+	http.Handle("/upload", &templateHandler{fileName: "upload.html"})
+	http.HandleFunc("/uploader", uploaderHandler)
 	http.Handle("/room", r)
 
 	go r.run()
