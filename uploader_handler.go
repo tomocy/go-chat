@@ -9,14 +9,14 @@ import (
 )
 
 func uploaderHandler(w http.ResponseWriter, r *http.Request) {
-	if err := setAvatarFile(r); err != nil {
+	if err := saveAvatarFile(r); err != nil {
 		log.Fatalf("could not set avatar file: %s\n", err)
 		return
 	}
 	redirect(w, "/chat")
 }
 
-func setAvatarFile(r *http.Request) error {
+func saveAvatarFile(r *http.Request) error {
 	userID := r.FormValue("userID")
 	if err := deleteAvatarFile(userID); err != nil {
 		return err
