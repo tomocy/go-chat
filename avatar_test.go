@@ -24,3 +24,20 @@ func TestAuthAvatar(t *testing.T) {
 		t.Errorf("have %s, but want %s\n", have, want)
 	}
 }
+
+func TestGravatarAvatar(t *testing.T) {
+	var gravatarAvatar GravatarAvatar
+	client := new(client)
+	client.user = map[string]interface{}{
+		"email": "tomocy.dev@gmail.com",
+	}
+	want := "//www.gravatar.com/avatar/3a34d1d201c7b30d0143c3d6fbe2b4e5"
+	have, err := gravatarAvatar.GetAvatarURL(client)
+	if err != nil {
+		t.Errorf("GravatarAvatar.GetAvatarURL should not return any error when client.email is valid\n: %s\n", err)
+	}
+	if have != want {
+		t.Error("GravatarAvatar does not return expected url\n")
+		t.Errorf("have %s, but want %s\n", have, want)
+	}
+}
