@@ -36,8 +36,8 @@ func setUpGomniauthProviders() {
 func setUpRouting() {
 	http.Handle("/chat", MustAuth(&templateHandler{fileName: "chat.html"}))
 	http.Handle("/login", &templateHandler{fileName: "login.html"})
-	http.HandleFunc("/logout", logoutHandler)
 	http.HandleFunc("/auth/", loginHandler)
+	http.HandleFunc("/logout", logoutHandler)
 	http.Handle("/upload", &templateHandler{fileName: "upload.html"})
 	http.HandleFunc("/uploader", uploaderHandler)
 	http.Handle("/avatars/", http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
