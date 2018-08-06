@@ -5,19 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Chat by Go</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <style>
+        li {
+            list-style: none;
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-    Lets's Chat from template
-    <ul id="messages"></ul>
+    <div class="container">
+        <div class="page-header">
+            <h1>Chat by tomocy</h1>
+        </div>
 
-    <form id="chatbox">
-        {{ .User.name }}
-        <br>
-        <textarea></textarea>
-        <input type="submit" value="send">
-        <a href="/logout">Logout</a>
-    </form>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <ul id="messages"></ul>
+            </div>
+        </div>
 
+        <form id="chatbox" role="form">
+            <div class="form-group">
+                <label for="message">Send message from {{ .User.name }}</label>
+                or
+                <a href="/logout">Logout</a>
+                <textarea id="message" class="form-control"></textarea>
+            </div>
+
+            <input type="submit" value="send" class="btn btn-default">
+        </form>
+    </div>
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
         $(function() {
@@ -41,7 +61,11 @@
                         $("<img>").css({
                             width: 50,
                             verticalAlign: "middle",
-                        }).attr("src", msg.AvatarURL),
+                            marginRight: 15,
+                        }).attr({
+                            src: msg.AvatarURL,
+                            title: msg.Name,
+                        }),
                         $("<strong>").text(msg.Name + ": "),
                         $("<span>").text(msg.Message),
                     )
