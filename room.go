@@ -14,6 +14,7 @@ type room struct {
 	join    chan *client
 	leave   chan *client
 	clients map[*client]bool
+	avatar  Avatar
 	tracer  trace.Tracer
 }
 
