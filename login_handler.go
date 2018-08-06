@@ -123,7 +123,7 @@ func getEncodedAuthCookieValue(u ChatUser) (string, error) {
 	}
 	authCookie := objx.New(map[string]interface{}{
 		"userID":     u.UniqueID(),
-		"name":       "user.Name()",
+		"name":       u.Name(),
 		"avatar_url": avatarURL,
 	}).MustBase64()
 
