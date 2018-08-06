@@ -1,6 +1,11 @@
 package main
 
-import "testing"
+import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 func TestAuthAvatar(t *testing.T) {
 	var authAvatar AuthAvatar
@@ -39,5 +44,26 @@ func TestGravatarAvatar(t *testing.T) {
 	if have != want {
 		t.Error("GravatarAvatar does not return expected url\n")
 		t.Errorf("have %s, but want %s\n", have, want)
+	}
+}
+
+func TestFileSystemAvatar(t *testing.T) {
+	userID := "abc"
+	fileName := filepath.Join("avatars", userID+".jpg")
+	ioutil.WriteFile(fileName, []byte{}, 0777)
+	defer os.Remove(fileName)
+
+	var fileSystemAvatar FileSystemAvatar
+	client := new(client)
+	client.user = map[string]interface{}{
+		"userID": userID,
+	}
+	want := "/" + fileName
+	have, err := fileSystemAvatar.GetAvatarURL(client)
+	if err != nil {
+		t.Errorf("FileSystemAvatar.GetAvatarURL should not return any error when client.userID is valid: %s\n", err)
+	}
+	if have != want {
+		t.Errorf("have %s, but want %s", have, want)
 	}
 }
