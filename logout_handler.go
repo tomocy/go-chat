@@ -10,6 +10,5 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge: -1,
 	})
 
-	w.Header().Set("Location", "/chat")
-	w.WriteHeader(http.StatusTemporaryRedirect)
+	redirect(w, "/chat")
 }
