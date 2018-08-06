@@ -20,7 +20,7 @@ type authRequest struct {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	authReq, err := getAuthRequest(r.URL.Path)
+	authReq, err := parseAuthRequest(r)
 	if err != nil {
 		log.Fatalf("could not get auth request: %s\n", err)
 	}
@@ -77,8 +77,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAuthRequest(path string) (authRequest, error) {
-	segs := strings.Split(path, "/")
+func parseAuthRequest(r *http.Request) (authRequest, error) {
+	segs := strings.Split(r.URL.Path, "/")
 	if len(segs) < 4 {
 		return authRequest{}, errors.New("the length of segs is not over 4")
 	}
