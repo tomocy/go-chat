@@ -13,8 +13,7 @@ func uploaderHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("could not set avatar file: %s\n", err)
 		return
 	}
-	w.Header().Set("Location", "/chat")
-	w.WriteHeader(http.StatusOK)
+	redirect(w, "/chat")
 }
 
 func setAvatarFile(r *http.Request) error {
