@@ -43,13 +43,18 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalln("could not get user from %s: %s", provider, err)
 		}
+		chatUser := &chatUser{User: user}
 		m := md5.New()
 		io.WriteString(m, strings.ToLower(user.Email()))
-		userID := fmt.Sprintf("%x", m.Sum(nil))
+		chatUser.uniqueID = fmt.Sprintf("%x", m.Sum(nil))
+		avatarURL, err := avatars.GetAvatarURL(chatUser)
+		if err != nil {
+			log.Fatalf("could not get avatar url: %s\n", err)
+		}
 		authCookie := objx.New(map[string]interface{}{
-			"userID":     userID,
+			"userID":     chatUser.uniqueID,
 			"name":       user.Name(),
-			"avatar_url": user.AvatarURL(),
+			"avatar_url": avatarURL,
 		}).MustBase64()
 		http.SetCookie(w, &http.Cookie{
 			Name:  "auth",

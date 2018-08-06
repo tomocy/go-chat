@@ -9,6 +9,12 @@ import (
 	"github.com/stretchr/gomniauth/providers/google"
 )
 
+var avatars Avatar = TryAvatars{
+	UseFileSystemAvatar,
+	UseAuthAvatar,
+	UseGravatar,
+}
+
 func main() {
 	addr := flag.String("addr", ":8080", "the application address")
 	flag.Parse()
@@ -18,7 +24,7 @@ func main() {
 		google.New(googleClientKey, googleClientSecret, googleCallbackURL),
 	)
 
-	r := newRoom(UseFileSystemAvatar)
+	r := newRoom()
 	http.Handle("/chat", MustAuth(&templateHandler{fileName: "chat.html"}))
 	http.Handle("/login", &templateHandler{fileName: "login.html"})
 	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
