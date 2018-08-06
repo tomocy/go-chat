@@ -34,7 +34,13 @@
                 alert("websocket connection was closed")
             }
             socket.onmessage = function(e) {
-                messages.append($("<li>").text(e.data))
+                var msg = JSON.parse(e.data)
+                messages.append(
+                    $("<li>").append(
+                        $("<strong>").text(msg.Name + ": "),
+                        $("<span>").text(msg.Message),
+                    )
+                )
             }
 
             $("#chatbox").submit(function() {
@@ -48,7 +54,7 @@
                     return false
                 }
 
-                socket.send(val)
+                socket.send(JSON.stringify({"Message": val}))
                 msgBox.val("")
                 return false
             })
