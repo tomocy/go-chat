@@ -29,7 +29,7 @@ func TestGravatarAvatar(t *testing.T) {
 	var gravatarAvatar GravatarAvatar
 	client := new(client)
 	client.user = map[string]interface{}{
-		"email": "tomocy.dev@gmail.com",
+		"userID": "3a34d1d201c7b30d0143c3d6fbe2b4e5",
 	}
 	want := "//www.gravatar.com/avatar/3a34d1d201c7b30d0143c3d6fbe2b4e5"
 	have, err := gravatarAvatar.GetAvatarURL(client)
