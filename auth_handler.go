@@ -10,7 +10,7 @@ func MustAuth(h http.Handler) http.Handler {
 	return &authHandler{next: h}
 }
 
-func (a *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if _, err := r.Cookie("auth"); err != nil {
 		if err == http.ErrNoCookie {
 			w.Header().Set("Location", "/login")
@@ -21,5 +21,5 @@ func (a *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	a.next.ServeHTTP(w, r)
+	h.next.ServeHTTP(w, r)
 }

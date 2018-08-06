@@ -13,10 +13,10 @@ type chatUser struct {
 	uniqueID string
 }
 
-func (c chatUser) UniqueID() string {
-	return c.uniqueID
+func (u chatUser) UniqueID() string {
+	return u.uniqueID
 }
 
-func (c chatUser) Name() string {
-	return c.User.Name()
+func (u chatUser) Name() string {
+	return u.User.Name()
 }

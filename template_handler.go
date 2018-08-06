@@ -15,9 +15,9 @@ type templateHandler struct {
 	templ    *template.Template
 }
 
-func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	t.once.Do(func() {
-		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.fileName)))
+func (h *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.once.Do(func() {
+		h.templ = template.Must(template.ParseFiles(filepath.Join("templates", h.fileName)))
 	})
 	data := map[string]interface{}{
 		"Host": r.Host,
@@ -26,5 +26,5 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		data["User"] = objx.MustFromBase64(authCookie.Value)
 	}
 
-	t.templ.Execute(w, data)
+	h.templ.Execute(w, data)
 }
