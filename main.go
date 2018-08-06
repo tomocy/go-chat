@@ -19,10 +19,7 @@ func main() {
 	addr := flag.String("addr", ":8080", "the application address")
 	flag.Parse()
 
-	gomniauth.SetSecurityKey(gomniauthSecret)
-	gomniauth.WithProviders(
-		google.New(googleClientKey, googleClientSecret, googleCallbackURL),
-	)
+	setUpGomniauthProviders()
 
 	r := newRoom()
 	http.Handle("/chat", MustAuth(&templateHandler{fileName: "chat.html"}))
@@ -50,4 +47,11 @@ func main() {
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatalf("could not listen and serve: %s", err)
 	}
+}
+
+func setUpGomniauthProviders() {
+	gomniauth.SetSecurityKey(gomniauthSecret)
+	gomniauth.WithProviders(
+		google.New(googleClientKey, googleClientSecret, googleCallbackURL),
+	)
 }
