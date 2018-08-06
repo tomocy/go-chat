@@ -4,7 +4,7 @@ import "time"
 
 type message struct {
 	Name      string
-	AvatorURL string
+	AvatarURL string
 	Message   string
 	When      time.Time
 }
