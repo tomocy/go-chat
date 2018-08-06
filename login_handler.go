@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	gomniauthcommon "github.com/stretchr/gomniauth/common"
 	"github.com/stretchr/objx"
 
 	"github.com/stretchr/gomniauth"
@@ -33,42 +34,17 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 		redirect(w, loginURL)
 	case "callback":
-		provider, err := gomniauth.Provider(authReq.provider)
+		user, err := getProviderUser(authReq.provider, r)
 		if err != nil {
-			log.Fatalln("could not get provider %s: %s", authReq.provider, err)
+			log.Fatalf("could not get provider user: %s\n", err)
 		}
-		creds, err := provider.CompleteAuth(objx.MustFromURLQuery(r.URL.RawQuery))
-		if err != nil {
-			log.Fatalln("could not get user credentials from %s: %s", authReq.provider, err)
-		}
-		user, err := provider.GetUser(creds)
-		if err != nil {
-			log.Fatalln("could not get user from %s: %s", authReq.provider, err)
-		}
-		chatUser := &chatUser{User: user}
-		m := md5.New()
-		io.WriteString(m, strings.ToLower(user.Email()))
-		chatUser.uniqueID = fmt.Sprintf("%x", m.Sum(nil))
-		avatarURL, err := avatars.GetAvatarURL(chatUser)
-		if err != nil {
-			log.Fatalf("could not get avatar url: %s\n", err)
-		}
-		authCookie := objx.New(map[string]interface{}{
-			"userID":     chatUser.uniqueID,
-			"name":       user.Name(),
-			"avatar_url": avatarURL,
-		}).MustBase64()
-		http.SetCookie(w, &http.Cookie{
-			Name:  "auth",
-			Value: authCookie,
-			Path:  "/",
-		})
+		chatUser := getChatUser(user)
+		setAuthCookie(w, chatUser)
 
-		w.Header().Set("Location", "/chat")
-		w.WriteHeader(http.StatusTemporaryRedirect)
+		redirect(w, "/chat")
 	default:
+		fmt.Fprintf(w, "unsupported action: %s\n", authReq.action)
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "not supported action: %s", authReq.action)
 	}
 }
 
@@ -95,6 +71,63 @@ func getLoginURL(providerName string) (string, error) {
 	}
 
 	return loginURL, nil
+}
+
+func getProviderUser(providerName string, r *http.Request) (gomniauthcommon.User, error) {
+	provider, err := gomniauth.Provider(providerName)
+	if err != nil {
+		return nil, err
+	}
+	creds, err := provider.CompleteAuth(objx.MustFromURLQuery(r.URL.RawQuery))
+	if err != nil {
+		return nil, err
+	}
+	user, err := provider.GetUser(creds)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func getChatUser(providerUser gomniauthcommon.User) *chatUser {
+	return &chatUser{
+		User:     providerUser,
+		uniqueID: getHasedUniqueID(providerUser.Email()),
+	}
+}
+
+func getHasedUniqueID(s string) string {
+	m := md5.New()
+	io.WriteString(m, strings.ToLower(s))
+
+	return fmt.Sprintf("%x", m.Sum(nil))
+}
+
+func setAuthCookie(w http.ResponseWriter, u ChatUser) {
+	authCookieValue, err := getEncodedAuthCookieValue(u)
+	if err != nil {
+		log.Fatalf("could not get encoded auth cookie value: %s\n", err)
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:  "auth",
+		Value: authCookieValue,
+		Path:  "/",
+	})
+}
+
+func getEncodedAuthCookieValue(u ChatUser) (string, error) {
+	avatarURL, err := avatars.GetAvatarURL(u)
+	if err != nil {
+		return "", err
+	}
+	authCookie := objx.New(map[string]interface{}{
+		"userID":     u.UniqueID(),
+		"name":       "user.Name()",
+		"avatar_url": avatarURL,
+	}).MustBase64()
+
+	return authCookie, nil
 }
 
 func redirect(w http.ResponseWriter, url string) {
