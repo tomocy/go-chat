@@ -19,6 +19,12 @@ func (h *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.once.Do(func() {
 		h.templ = template.Must(template.ParseFiles(filepath.Join("templates", h.fileName)))
 	})
+	data := getDataForTemplate(r)
+
+	h.templ.Execute(w, data)
+}
+
+func getDataForTemplate(r *http.Request) map[string]interface{} {
 	data := map[string]interface{}{
 		"Host": r.Host,
 	}
@@ -26,5 +32,5 @@ func (h *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		data["User"] = objx.MustFromBase64(authCookie.Value)
 	}
 
-	h.templ.Execute(w, data)
+	return data
 }
