@@ -36,6 +36,7 @@ func main() {
 	http.Handle("/upload", &templateHandler{fileName: "upload.html"})
 	http.HandleFunc("/uploader", uploaderHandler)
 	http.Handle("/room", r)
+	http.Handle("/avatars/", http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
 
 	go r.run()
 
