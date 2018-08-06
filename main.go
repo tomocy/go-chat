@@ -18,12 +18,7 @@ var avatars Avatar = TryAvatars{
 func main() {
 	setUpGomniauthProviders()
 	setUpRouting()
-
-	addr := getAddress()
-	log.Printf("start listening and serving. port: %s", addr)
-	if err := http.ListenAndServe(addr, nil); err != nil {
-		log.Fatalf("could not listen and serve: %s", err)
-	}
+	startListeningAndServing()
 }
 
 func setUpGomniauthProviders() {
@@ -45,6 +40,14 @@ func setUpRouting() {
 	r := newRoom()
 	http.Handle("/room", r)
 	go r.run()
+}
+
+func startListeningAndServing() {
+	addr := getAddress()
+	log.Printf("start listening and serving. port: %s", addr)
+	if err := http.ListenAndServe(addr, nil); err != nil {
+		log.Fatalf("could not listen and serve: %s", err)
+	}
 }
 
 func getAddress() string {
