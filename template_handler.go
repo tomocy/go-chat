@@ -19,8 +19,8 @@ func (h *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.once.Do(func() {
 		h.templ = template.Must(template.ParseFiles(filepath.Join("templates", h.fileName)))
 	})
-	data := getDataForTemplate(r)
 
+	data := getDataForTemplate(r)
 	h.templ.Execute(w, data)
 }
 
