@@ -21,7 +21,22 @@ func main() {
 
 	setUpGomniauthProviders()
 
-	r := newRoom()
+	setUpRouting()
+
+	log.Printf("start listening and serving. port: %s", *addr)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
+		log.Fatalf("could not listen and serve: %s", err)
+	}
+}
+
+func setUpGomniauthProviders() {
+	gomniauth.SetSecurityKey(gomniauthSecret)
+	gomniauth.WithProviders(
+		google.New(googleClientKey, googleClientSecret, googleCallbackURL),
+	)
+}
+
+func setUpRouting() {
 	http.Handle("/chat", MustAuth(&templateHandler{fileName: "chat.html"}))
 	http.Handle("/login", &templateHandler{fileName: "login.html"})
 	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
@@ -38,20 +53,9 @@ func main() {
 	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/upload", &templateHandler{fileName: "upload.html"})
 	http.HandleFunc("/uploader", uploaderHandler)
-	http.Handle("/room", r)
 	http.Handle("/avatars/", http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
 
+	r := newRoom()
+	http.Handle("/room", r)
 	go r.run()
-
-	log.Printf("start listening and serving. port: %s", *addr)
-	if err := http.ListenAndServe(*addr, nil); err != nil {
-		log.Fatalf("could not listen and serve: %s", err)
-	}
-}
-
-func setUpGomniauthProviders() {
-	gomniauth.SetSecurityKey(gomniauthSecret)
-	gomniauth.WithProviders(
-		google.New(googleClientKey, googleClientSecret, googleCallbackURL),
-	)
 }
