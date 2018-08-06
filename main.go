@@ -39,17 +39,7 @@ func setUpGomniauthProviders() {
 func setUpRouting() {
 	http.Handle("/chat", MustAuth(&templateHandler{fileName: "chat.html"}))
 	http.Handle("/login", &templateHandler{fileName: "login.html"})
-	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
-			Name:   "auth",
-			Value:  "",
-			Path:   "/",
-			MaxAge: -1,
-		})
-
-		w.Header().Set("Location", "/chat")
-		w.WriteHeader(http.StatusTemporaryRedirect)
-	})
+	http.HandleFunc("/logout", logoutHandler)
 	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/upload", &templateHandler{fileName: "upload.html"})
 	http.HandleFunc("/uploader", uploaderHandler)
