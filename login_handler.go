@@ -26,17 +26,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch authReq.action {
 	case "login":
-		provider, err := gomniauth.Provider(authReq.provider)
+		loginURL, err := getLoginURL(authReq.provider)
 		if err != nil {
-			log.Fatalln("could not get proivder %s: %s", authReq.provider, err)
-		}
-		loginURL, err := provider.GetBeginAuthURL(nil, nil)
-		if err != nil {
-			log.Fatalln("could not get login url of %s: %s", authReq.provider, err)
+			log.Fatalf("could not get login url: %s\n", err)
 		}
 
-		w.Header().Set("Location", loginURL)
-		w.WriteHeader(http.StatusTemporaryRedirect)
+		redirect(w, loginURL)
 	case "callback":
 		provider, err := gomniauth.Provider(authReq.provider)
 		if err != nil {
@@ -87,4 +82,22 @@ func parseAuthRequest(r *http.Request) (authRequest, error) {
 		action:   segs[2],
 		provider: segs[3],
 	}, nil
+}
+
+func getLoginURL(providerName string) (string, error) {
+	provider, err := gomniauth.Provider(providerName)
+	if err != nil {
+		return "", err
+	}
+	loginURL, err := provider.GetBeginAuthURL(nil, nil)
+	if err != nil {
+		return "", err
+	}
+
+	return loginURL, nil
+}
+
+func redirect(w http.ResponseWriter, url string) {
+	w.Header().Set("Location", url)
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }
