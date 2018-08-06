@@ -16,15 +16,12 @@ var avatars Avatar = TryAvatars{
 }
 
 func main() {
-	addr := flag.String("addr", ":8080", "the application address")
-	flag.Parse()
-
 	setUpGomniauthProviders()
-
 	setUpRouting()
 
-	log.Printf("start listening and serving. port: %s", *addr)
-	if err := http.ListenAndServe(*addr, nil); err != nil {
+	addr := getAddress()
+	log.Printf("start listening and serving. port: %s", addr)
+	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatalf("could not listen and serve: %s", err)
 	}
 }
@@ -48,4 +45,11 @@ func setUpRouting() {
 	r := newRoom()
 	http.Handle("/room", r)
 	go r.run()
+}
+
+func getAddress() string {
+	addr := flag.String("addr", ":8080", "the application address")
+	flag.Parse()
+
+	return *addr
 }
